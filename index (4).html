@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FHF Tools – First Hand Finances</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f12;
+      --surface: #13171e;
+      --card: #181d26;
+      --border: #222836;
+      --accent: #00e5a0;
+      --accent2: #0094ff;
+      --text: #e8edf5;
+      --muted: #6b7585;
+      --tag: #1a2235;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NOISE TEXTURE */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* GRID BACKGROUND */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(13,15,18,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    /* HTML LOGO - embeddable in sheets */
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      color: #0d0f12;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    }
+
+    .logo-wordmark {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .logo-wordmark span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #0d0f12 !important;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 500 !important;
+      transition: opacity 0.2s !important;
+    }
+
+    .nav-cta:hover { opacity: 0.85; color: #0d0f12 !important; }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 120px 24px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,229,160,0.08);
+      border: 1px solid rgba(0,229,160,0.2);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(42px, 7vw, 80px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    h1 .accent { color: var(--accent); }
+    h1 .accent2 { color: var(--accent2); }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0d0f12;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,229,160,0.3); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 400;
+      font-size: 15px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SECTION */
+    section {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+      line-height: 1.1;
+    }
+
+    /* TOOLS GRID */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(0,229,160,0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    }
+
+    .tool-card:hover::before { transform: scaleX(1); }
+
+    .tool-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--tag);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .tool-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+    }
+
+    .tool-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .tool-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .tool-price {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .tool-tag {
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--tag);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+    }
+
+    .coming-soon {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .coming-soon .tool-price {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    /* PATREON */
+    .patreon-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .patreon-block::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(0,229,160,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .patreon-price {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 56px;
+      letter-spacing: -2px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .patreon-price span {
+      font-size: 22px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .patreon-sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .patreon-perks {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .patreon-perks li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .perk-check {
+      width: 20px;
+      height: 20px;
+      background: rgba(0,229,160,0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .perk-check::after {
+      content: '✓';
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .patreon-right h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .patreon-right p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .patreon-tools-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .preview-tag {
+      background: var(--tag);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* YOUTUBE */
+    .yt-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .yt-icon {
+      width: 64px;
+      height: 64px;
+      background: #ff0000;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 28px;
+    }
+
+    .yt-text h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .yt-text p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .yt-text a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .patreon-block { grid-template-columns: 1fr; padding: 32px 24px; }
+      .yt-block { flex-direction: column; text-align: center; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-mark">FHF</div>
+    <span class="logo-wordmark">FHF <span>Tools</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#tools">Templates</a></li>
+    <li><a href="#patreon">Membership</a></li>
+    <li><a href="#youtube">YouTube</a></li>
+    <li><a href="https://www.patreon.com/cw/FHFTools" target="_blank" class="nav-cta">Join £7.99/mo</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">First Hand Finances</div>
+  <h1>Google Sheets<br><span class="accent">that actually</span><br><span class="accent2">do the work</span></h1>
+  <p class="hero-sub">Powerful, ready-to-use Google Sheet web apps for tracking your finances, habits, career and life. Built by First Hand Finances.</p>
+  <div class="hero-actions">
+    <a href="#tools" class="btn-primary">Browse Templates</a>
+    <a href="#patreon" class="btn-secondary">Get All for £7.99/mo →</a>
+  </div>
+</div>
+
+<section id="tools">
+  <p class="section-label">Templates</p>
+  <h2 class="section-title">Pick your tracker.<br>Own your progress.</h2>
+
+  <div class="tools-grid">
+
+    <a class="tool-card" href="https://fhftools.etsy.com" target="_blank">
+      <div class="tool-icon">💪</div>
+      <div class="tool-name">75 Days Hard Tracker</div>
+      <div class="tool-desc">Track all 5 daily tasks across the full 75 day challenge. Stay accountable, visualise your streak, never lose count.</div>
+      <div class="tool-footer">
+        <span class="tool-price">£4.99</span>
+        <span class="tool-tag">Etsy →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://fhftools.etsy.com" target="_blank">
+      <div class="tool-icon">📦</div>
+      <div class="tool-name">Subscription Tracker</div>
+      <div class="tool-desc">See exactly what you're paying, when renewals hit, and where to cut. Stop getting surprised by billing dates.</div>
+      <div class="tool-footer">
+        <span class="tool-price">£3.99</span>
+        <span class="tool-tag">Etsy →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://fhftools.etsy.com" target="_blank">
+      <div class="tool-icon">💼</div>
+      <div class="tool-name">Job Application Tracker</div>
+      <div class="tool-desc">Track every application, interview stage, follow-up date and outcome in one clean dashboard.</div>
+      <div class="tool-footer">
+        <span class="tool-price">£2.99</span>
+        <span class="tool-tag">Etsy →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://fhftools.etsy.com" target="_blank">
+      <div class="tool-icon">🎂</div>
+      <div class="tool-name">Birthday Tracker</div>
+      <div class="tool-desc">Never forget a birthday again. Automatic countdowns, age calculator, and gift idea notes all in one place.</div>
+      <div class="tool-footer">
+        <span class="tool-price">£2.99</span>
+        <span class="tool-tag">Etsy →</span>
+      </div>
+    </a>
+
+    <div class="tool-card coming-soon">
+      <div class="tool-icon">📊</div>
+      <div class="tool-name">Budget Tracker</div>
+      <div class="tool-desc">Income, expenses, savings goals and auto charts. Full monthly financial overview in one sheet.</div>
+      <div class="tool-footer">
+        <span class="tool-price">Coming Soon</span>
+        <span class="tool-tag">Soon</span>
+      </div>
+    </div>
+
+    <div class="tool-card coming-soon">
+      <div class="tool-icon">✅</div>
+      <div class="tool-name">Habit Tracker</div>
+      <div class="tool-desc">Daily habit check-ins, streak counters and visual progress. Build the routines that stick.</div>
+      <div class="tool-footer">
+        <span class="tool-price">Coming Soon</span>
+        <span class="tool-tag">Soon</span>
+      </div>
+    </div>
+
+    <div class="tool-card coming-soon">
+      <div class="tool-icon">📈</div>
+      <div class="tool-name">Matched Betting Tracker</div>
+      <div class="tool-desc">Log your bets, calculate profit and track your monthly matched betting income.</div>
+      <div class="tool-footer">
+        <span class="tool-price">Coming Soon</span>
+        <span class="tool-tag">Soon</span>
+      </div>
+    </div>
+
+    <div class="tool-card coming-soon">
+      <div class="tool-icon">💰</div>
+      <div class="tool-name">Online Income Tracker</div>
+      <div class="tool-desc">Track every income stream in one place. Etsy, Prolific, UserTesting, matched betting and more.</div>
+      <div class="tool-footer">
+        <span class="tool-price">Coming Soon</span>
+        <span class="tool-tag">Soon</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="patreon">
+  <p class="section-label">Membership</p>
+  <h2 class="section-title">Get everything.<br>All at once.</h2>
+
+  <div class="patreon-block">
+    <div class="patreon-left">
+      <div class="patreon-price">£7.99 <span>/ month</span></div>
+      <p class="patreon-sub">Cancel anytime. Instant access to everything.</p>
+      <ul class="patreon-perks">
+        <li><div class="perk-check"></div>Instant access to every template in the FHF Tools library</li>
+        <li><div class="perk-check"></div>All future templates included — no extra cost</li>
+        <li><div class="perk-check"></div>Updates and new features added to existing sheets</li>
+        <li><div class="perk-check"></div>Early access to templates before Etsy release</li>
+        <li><div class="perk-check"></div>Support First Hand Finances & the YouTube channel</li>
+        <li><div class="perk-check"></div>Request features you want added to any tracker</li>
+      </ul>
+      <a href="https://www.patreon.com/cw/FHFTools" target="_blank" class="btn-primary">Join on Patreon →</a>
+    </div>
+    <div class="patreon-right">
+      <h3>Why join instead of buying individually?</h3>
+      <p>Buying just 2 templates individually already costs more than a month's membership. With 20+ trackers in the library — and more added every month — the Patreon pays for itself immediately.</p>
+      <p>Every sheet is a live Google Sheet you download and keep. Members always get the latest version.</p>
+      <div class="patreon-tools-preview">
+        <span class="preview-tag">75 Days Hard</span>
+        <span class="preview-tag">Subscriptions</span>
+        <span class="preview-tag">Job Applications</span>
+        <span class="preview-tag">Birthdays</span>
+        <span class="preview-tag">Budget</span>
+        <span class="preview-tag">Habits</span>
+        <span class="preview-tag">Matched Betting</span>
+        <span class="preview-tag">Income</span>
+        <span class="preview-tag">+ more every month</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="youtube">
+  <div class="yt-block">
+    <div class="yt-icon">▶</div>
+    <div class="yt-text">
+      <h3>First Hand Finances on YouTube</h3>
+      <p>Watch the journey of building real income streams from scratch — matched betting, Etsy, Prolific, Patreon and more. Honest numbers, real results, no fluff.<br><br>
+      <a href="https://youtube.com/@FirstHandFinances" target="_blank">Watch on YouTube →</a></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 FHF Tools · First Hand Finances</p>
+  <div style="display:flex;gap:24px;">
+    <a href="https://fhftools.etsy.com" target="_blank">Etsy Shop</a>
+    <a href="https://www.patreon.com/cw/FHFTools" target="_blank">Patreon</a>
+    <a href="https://youtube.com/@FirstHandFinances" target="_blank">YouTube</a>
+  </div>
+</footer>
+
+</body>
+</html>
