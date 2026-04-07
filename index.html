@@ -374,6 +374,23 @@
       font-weight: 400;
     }
 
+    .sale-banner {
+      position: absolute;
+      top: 18px;
+      right: -28px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: #0d0f12;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 5px 36px;
+      transform: rotate(45deg);
+      transform-origin: center;
+      letter-spacing: 0.5px;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,229,160,0.3);
+    }
+
     /* PATREON */
     .patreon-block {
       background: var(--card);
@@ -623,12 +640,16 @@
     </div>
 
     <a class="tool-card" href="https://www.etsy.com/uk/listing/4484623352/birthday-tracker-google-sheets-web-app" target="_blank">
+      <div class="sale-banner">25% OFF</div>
       <div class="tool-icon">🎂</div>
       <div class="tool-name">Birthday Tracker</div>
       <div class="tool-desc">Never forget a birthday again. Automatic countdowns, age calculator, and gift idea notes all in one place.</div>
       <div class="tool-footer">
-        <span class="tool-price">£2.69 <span style="font-size:10px;font-weight:400;opacity:0.7">inc. VAT</span></span> <span style="font-size:11px;text-decoration:line-through;color:var(--muted);margin-left:4px">£3.59</span> <span style="font-size:10px;background:#00e5a0;color:#0d0f12;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:2px">25% OFF</span>
-        <span class="tool-tag">Etsy →</span>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span class="tool-price">£2.69</span>
+          <span style="font-size:11px;text-decoration:line-through;color:var(--muted)">£3.59</span>
+          <span style="font-size:10px;color:var(--muted)">inc. VAT</span>
+        </div>
       </div>
     </a>
 
